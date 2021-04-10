@@ -38,7 +38,7 @@ int main(int argc, char **argv)
     mpc_parser_t *Number = mpc_new("number");
     mpc_parser_t *Operator = mpc_new("operator");
     mpc_parser_t *Expr = mpc_new("expr");
-    mpc_parser_t *Lispy = mpc_new("lispy");
+    mpc_parser_t *DivLisp = mpc_new("lispy");
 
     /* Define them with the following Language */
     mpca_lang(MPCA_LANG_DEFAULT,
@@ -48,7 +48,7 @@ int main(int argc, char **argv)
     expr     : <number> | '(' <operator> <expr>+ ')' ;  \
     lispy    : /^/ <operator> <expr>+ /$/ ;             \
     ",
-              Number, Operator, Expr, Lispy);
+              Number, Operator, Expr, DivLisp);
 
     /*Print version and Exit Option*/
     puts("DivLisp version 0.1");
@@ -71,7 +71,7 @@ int main(int argc, char **argv)
         free(input);
     }
 
-    mpc_cleanup(4, Number, Operator, Expr, Lispy);
+    mpc_cleanup(4, Number, Operator, Expr, DivLisp);
 
     return 0;
 }

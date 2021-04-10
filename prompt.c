@@ -1,7 +1,9 @@
 #include <stdio.h>
-
-//Input buffer
-static char input[2048];
+#include <stdlib.h>
+//readline is used to read input from some prompt, while allowing for editing of that input.
+#include <editline/readline.h>
+//add_history lets us record the history of inputs so that they can be retrieved with the up and down arrows.
+#include <editline/history.h>
 
 int main(int argc, char **argv)
 {
@@ -14,14 +16,17 @@ int main(int argc, char **argv)
     while (1)
     {
 
-        /*REPL Output Prompt*/
-        fputs("DivLisp> ", stdout);
+        /*Output REPL prompt and get input*/
+        char *input = readline("DivLisp> ");
 
-        /*Read user input of maximum length 2048*/
-        fgets(input, 2048, stdin);
+        /*Add input to history*/
+        add_history(input);
 
         /*Echo back to the user*/
-        printf("No you're a %s", input);
+        printf("No you're a %s\n", input);
+
+        /*Free retrieved input*/
+        free(input);
     }
 
     return 0;

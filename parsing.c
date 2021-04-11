@@ -64,13 +64,26 @@ int main(int argc, char **argv)
         /*Add input to history*/
         add_history(input);
 
-        /*Echo back to the user*/
-        printf("No you're a %s\n", input);
+        /*Parse the user input*/
+        mpc_result_t r;
+        if (mpc_parse("<stdin>", input, DivLisp, &r))
+        {
+            /*On success print and delete the AST*/
+            mpc_ast_print(r.output);
+            mpc_ast_delete(r.output);
+        }
+        else
+        {
+            /*Otherwise print and delete the Error*/
+            mpc_err_print(r.error);
+            mpc_err_delete(r.error);
+        }
 
         /*Free retrieved input*/
         free(input);
     }
 
+    /* Cleanup our parser*/
     mpc_cleanup(4, Number, Operator, Expr, DivLisp);
 
     return 0;

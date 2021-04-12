@@ -49,11 +49,18 @@ enum
 };
 
 /* Declare New lval Struct */
-typedef struct
+typedef struct lval
 {
     int type;
     double num;
-    int err;
+
+    /*Error and Symbol types contain strings*/
+    char *err;
+    char *sym;
+
+    /*Count and Pointer to a list of "lval*" */
+    int count;
+    struct lval **cell;
 } lval;
 
 /* Create a new number type lval */

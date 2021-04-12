@@ -198,6 +198,8 @@ lval *lval_read(mpc_ast_t *t)
     return x;
 }
 
+void lval_print(lval *v);
+
 void lval_expr_print(lval *v, char open, char close)
 {
     putchar(open);
@@ -242,95 +244,6 @@ void lval_println(lval *v)
     putchar('\n');
 }
 
-lval eval_op(lval x, char *op, lval y)
-{
-
-    /* If either value is an error return it */
-    if (x.type == LVAL_ERR)
-    {
-        return x;
-    }
-    if (y.type == LVAL_ERR)
-    {
-        return y;
-    }
-
-    /* Otherwise do maths on the number values */
-    if (strcmp(op, "+") == 0)
-    {
-        return lval_num(x.num + y.num);
-    }
-    if (strcmp(op, "-") == 0)
-    {
-        return lval_num(x.num - y.num);
-    }
-    if (strcmp(op, "*") == 0)
-    {
-        return lval_num(x.num * y.num);
-    }
-    if (strcmp(op, "/") == 0)
-    {
-        /* If second operand is zero return error */
-        return y.num == 0
-                   ? lval_err(LERR_DIV_ZERO)
-                   : lval_num(x.num / y.num);
-    }
-
-    if (strcmp(op, "%") == 0)
-    {
-        return lval_num(fmod(x.num, y.num));
-    }
-    if (strcmp(op, "^") == 0)
-    {
-        return lval_num((double)(pow(x.num, y.num)));
-    }
-    if (strcmp(op, "min") == 0)
-    {
-        return lval_num((x.num < y.num ? x.num : y.num));
-    }
-    if (strcmp(op, "max") == 0)
-    {
-        return lval_num((x.num < y.num ? y.num : x.num));
-    }
-
-    return lval_err(LERR_BAD_OP);
-}
-
-lval eval(mpc_ast_t *t)
-{
-
-    if (strstr(t->tag, "number"))
-    {
-        /* Check if there is some error in conversion */
-        errno = 0;
-        double x = strtod(t->contents, NULL);
-        return errno != ERANGE ? lval_num(x) : lval_err(LERR_BAD_NUM);
-    }
-
-    char *op = t->children[1]->contents;
-    lval x = eval(t->children[2]);
-
-    //The number of children is 4, when there is only one operand.
-    if (t->children_num == 4)
-    {
-        if (strcmp(op, "-") == 0)
-            return lval_num(-1 * x.num);
-        if (strcmp(op, "+") == 0)
-            return lval_num(x.num);
-    }
-    else
-    {
-        int i = 3;
-        while (strstr(t->children[i]->tag, "expr"))
-        {
-            x = eval_op(x, op, eval(t->children[i]));
-            i++;
-        }
-    }
-
-    return x;
-}
-
 int main(int argc, char **argv)
 {
 
@@ -373,10 +286,13 @@ int main(int argc, char **argv)
         if (mpc_parse("<stdin>", input, DivLisp, &r))
         {
             /*On success print result and delete the AST*/
-            lval result = eval(r.output);
+            /*lval result = eval(r.output);
             lval_println(result);
             //mpc_ast_print(r.output);
-            mpc_ast_delete(r.output);
+            mpc_ast_delete(r.output);*/
+            lval *x = lval_read(r.output);
+            lval_println(x);
+            lval_del(x);
         }
         else
         {

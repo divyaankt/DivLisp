@@ -43,7 +43,9 @@ enum
 enum
 {
     LVAL_NUM,
-    LVAL_ERR
+    LVAL_ERR,
+    LVAL_SYM,  //Operator of S-Expression
+    LVAL_SEXPR //Actual S-Expression
 };
 
 /* Declare New lval Struct */

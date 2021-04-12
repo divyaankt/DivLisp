@@ -198,38 +198,45 @@ lval *lval_read(mpc_ast_t *t)
     return x;
 }
 
-/* Print an "lval" */
-void lval_print(lval v)
+void lval_expr_print(lval *v, char open, char close)
 {
-    switch (v.type)
+    putchar(open);
+    for (int i = 0; i < v->count; i++)
     {
-    /* In the case the type is a number print it */
-    /* Then 'break' out of the switch. */
-    case LVAL_NUM:
-        printf("%lf", v.num);
-        break;
 
-    /* In the case the type is an error */
+        /* Print Value contained within */
+        lval_print(v->cell[i]);
+
+        /* Don't print trailing space if last element */
+        if (i != (v->count - 1))
+        {
+            putchar(' ');
+        }
+    }
+    putchar(close);
+}
+
+/* Print an "lval" */
+void lval_print(lval *v)
+{
+    switch (v->type)
+    {
+    case LVAL_NUM:
+        printf("%lf", v->num);
+        break;
     case LVAL_ERR:
-        /* Check what type of error it is and print it */
-        if (v.err == LERR_DIV_ZERO)
-        {
-            printf("Error: Division By Zero!");
-        }
-        if (v.err == LERR_BAD_OP)
-        {
-            printf("Error: Invalid Operator!");
-        }
-        if (v.err == LERR_BAD_NUM)
-        {
-            printf("Error: Invalid Number!");
-        }
+        printf("Error: %s", v->err);
+        break;
+    case LVAL_SYM:
+        printf("%s", v->sym);
+        break;
+    case LVAL_SEXPR:
+        lval_expr_print(v, '(', ')');
         break;
     }
 }
-
 /* Print an "lval" followed by a newline */
-void lval_println(lval v)
+void lval_println(lval *v)
 {
     lval_print(v);
     putchar('\n');

@@ -342,14 +342,6 @@ lval *builtin_op(lval *a, char *op)
         {
             x->num = (double)(pow(x->num, y->num));
         }
-        if (strcmp(op, "min") == 0)
-        {
-            x->num = (x->num < y->num ? x->num : y->num);
-        }
-        if (strcmp(op, "max") == 0)
-        {
-            x->num = (x->num > y->num ? x->num : y->num);
-        }
         lval_del(y);
     }
 
@@ -427,12 +419,11 @@ int main(int argc, char **argv)
               "                                                             \
     number   : /-?[0-9]+/;                                                  \
     symbol : '+' | '-' | '*' | '/' | '%' | '^';                             \
-    function : /[_a-zA-Z]+/;                                                \
     sexpr    : '(' <expr>* ')';                                             \
-    expr     : <number> | <symbol> | <function> | <sexpr>;                  \
+    expr     : <number> | <symbol> | <sexpr>;                  \
     divlisp    : /^/ <expr>* /$/;                                           \
     ",
-              Number, Symbol, Function, Sexpr, Expr, DivLisp);
+              Number, Symbol, Sexpr, Expr, DivLisp);
 
     /*Print version and Exit Option*/
     puts("DivLisp version 0.1");

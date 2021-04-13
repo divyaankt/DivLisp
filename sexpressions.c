@@ -31,14 +31,6 @@ void add_history(char *unused) {}
 #include <editline/history.h>
 #endif
 
-/* Create Enumeration of Possible Error Types */
-enum
-{
-    LERR_DIV_ZERO,
-    LERR_BAD_OP,
-    LERR_BAD_NUM
-};
-
 /* Create Enumeration of Possible lval Types */
 enum
 {

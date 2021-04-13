@@ -244,6 +244,59 @@ void lval_println(lval *v)
     putchar('\n');
 }
 
+/*Helper function to evaluate S-Expression*/
+lval *lval_eval(lval *v)
+{
+    /*Evaluate Sexpressions*/
+    if (v->type == LVAL_SEXPR)
+        return lval_eval_sexpr(v);
+
+    /*All other lval types remain the same*/
+    return v;
+}
+/*Main function for evaluating S-Expressions*/
+lval *lval_eval_sexpr(lval *v)
+{
+
+    /*Evaluate Children*/
+    for (int i = 0; i < v->count; i++)
+    {
+        v->cell[i] = lval_eval(v->cell[i]);
+    }
+
+    /*Error Checking*/
+    for (int i = 0; i < v->count; i++)
+    {
+        if (v->cell[i]->type == LVAL_ERR)
+            return lval_take(v, i);
+    }
+
+    /*Empty Expression*/
+    if (v->count == 0)
+        return v;
+
+    /*Single Expression*/
+    if (v->count == 1)
+        return lval_take(v, 0);
+
+    /*Ensure that first element is symbol*/
+    lval *f = lval_pop(v, 0);
+
+    if (f->type != LVAL_SYM)
+    {
+        lval_del(f);
+        lval_del(v);
+        return lval_err("S-Expression doesn't start with symbol!!");
+    }
+
+    /*Call builtin with operator*/
+    lval *result = builtin_op(v, f->sym);
+
+    lval_del(f);
+
+    return result;
+}
+
 int main(int argc, char **argv)
 {
 

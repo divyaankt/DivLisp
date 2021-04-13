@@ -463,7 +463,7 @@ int main(int argc, char **argv)
     }
 
     /* Cleanup our parser*/
-    mpc_cleanup(4, DivLisp, Sexpr, Expr, Number, Symbol);
+    mpc_cleanup(5, DivLisp, Sexpr, Expr, Number, Symbol);
 
     return 0;
 }

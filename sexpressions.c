@@ -410,7 +410,6 @@ int main(int argc, char **argv)
     mpc_parser_t *Number = mpc_new("number");
     mpc_parser_t *Symbol = mpc_new("symbol");
     mpc_parser_t *Sexpr = mpc_new("sexpr");
-    mpc_parser_t *Function = mpc_new("function");
     mpc_parser_t *Expr = mpc_new("expr");
     mpc_parser_t *DivLisp = mpc_new("divlisp");
 
@@ -464,7 +463,7 @@ int main(int argc, char **argv)
     }
 
     /* Cleanup our parser*/
-    mpc_cleanup(5, DivLisp, Sexpr, Expr, Number, Symbol, Function);
+    mpc_cleanup(4, DivLisp, Sexpr, Expr, Number, Symbol);
 
     return 0;
 }

@@ -244,6 +244,44 @@ void lval_println(lval *v)
     putchar('\n');
 }
 
+/*
+The lval_pop function extracts a single element from an S-Expression at index i 
+and shifts the rest of the list backward so that it no longer contains that lval*. 
+It then returns the extracted value. 
+*/
+lval *lval_pop(lval *v, int i)
+{
+    /*Find the item at "i"*/
+    lval *x = v->cell[i];
+
+    size_t newSize = sizeof(lval *) * (v->count - i - 1);
+    /*Shift memory after the item at "i" over the top*/
+    memmove(&v->cell[i], &v->cell[i + 1],
+            (v->count - i - 1) * sizeof(lval *));
+
+    /*Decrease the count of the items in the list*/
+    v->count--;
+
+    /*Reallocate the memory used*/
+    v->cell = realloc(v->cell, sizeof(lval *) * v->count);
+
+    return x;
+}
+
+/*
+The lval_take function is similar to lval_pop but it deletes the list it has 
+extracted the element from. This is like taking an element from the list and 
+deleting the rest. It is a slight variation on lval_pop but it makes our code 
+easier to read in some places. Unlike lval_pop, only the expression you take 
+from the list needs to be deleted by lval_del.
+*/
+lval *lval_take(lval *v, int i)
+{
+    lval *x = lval_pop(v, i);
+    lval_del(v);
+    return x;
+}
+
 /*Helper function to evaluate S-Expression*/
 lval *lval_eval(lval *v)
 {

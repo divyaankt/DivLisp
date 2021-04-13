@@ -254,7 +254,7 @@ lval *lval_pop(lval *v, int i)
     /*Find the item at "i"*/
     lval *x = v->cell[i];
 
-    size_t newSize = sizeof(lval *) * (v->count - i - 1);
+    //size_t newSize = sizeof(lval *) * (v->count - i - 1);
     /*Shift memory after the item at "i" over the top*/
     memmove(&v->cell[i], &v->cell[i + 1],
             (v->count - i - 1) * sizeof(lval *));
@@ -286,12 +286,12 @@ lval *lval_take(lval *v, int i)
 lval *builtin_op(lval *a, char *op)
 {
     /*First ensure all arguments are numbers*/
-    for (int i = 0l i < a->count; i++)
+    for (int i = 0; i < a->count; i++)
     {
         if (a->cell[i]->type != LVAL_NUM)
         {
             lval_del(a);
-            return lval_err("Cannot operate on non-numbers")
+            return lval_err("Cannot operate on non-numbers");
         }
     }
 
@@ -336,7 +336,7 @@ lval *builtin_op(lval *a, char *op)
         }
         if (strcmp(op, "%") == 0)
         {
-            x->num = fmod(x->num, y->num));
+            x->num = fmod(x->num, y->num);
         }
         if (strcmp(op, "^") == 0)
         {
@@ -357,6 +357,7 @@ lval *builtin_op(lval *a, char *op)
     return x;
 }
 
+lval *lval_eval_sexpr(lval *v);
 /*Helper function to evaluate S-Expression*/
 lval *lval_eval(lval *v)
 {

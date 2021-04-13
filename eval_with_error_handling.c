@@ -170,7 +170,7 @@ lval eval(mpc_ast_t *t)
     {
         /* Check if there is some error in conversion */
         errno = 0;
-        double x = atof(t->contents);
+        double x = strtod(t->contents, NULL);
         return errno != ERANGE ? lval_num(x) : lval_err(LERR_BAD_NUM);
     }
 

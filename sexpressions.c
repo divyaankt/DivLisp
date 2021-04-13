@@ -148,7 +148,7 @@ lval *lval_read_num(mpc_ast_t *t)
 {
     /* Check if there is some error in conversion */
     errno = 0;
-    double x = strtod(t->contents, NULL);
+    double x = strtof(t->contents, NULL);
     return errno != ERANGE ? lval_num(x) : lval_err("Invalid Number!!");
 }
 
@@ -253,19 +253,19 @@ int main(int argc, char **argv)
     mpc_parser_t *Sexpr = mpc_new("sexpr");
     mpc_parser_t *Function = mpc_new("function");
     mpc_parser_t *Expr = mpc_new("expr");
-    mpc_parser_t *DivLisp = mpc_new("lispy");
+    mpc_parser_t *DivLisp = mpc_new("divlisp");
 
     /* Define them with the following Language */
     mpca_lang(MPCA_LANG_DEFAULT,
-              "                                                     \
-    lispy    : /^/ (<symbol> | <function>) <expr>+ /$/;             \
-    sexpr    : '(' <expr>* ')';                                 \
-    expr     : <number> | '('(<symbol> | <function>)<expr>+')' ; \
-    number   : /-?[0-9]+.?[0-9]*/;                                             \
-    symbol : '+' | '-' | '*' | '/' | '%' | '^';                         \
-    function : /[_a-zA-Z]+/;                                              \
-            ",
-              DivLisp, Sexpr, Expr, Number, Symbol, Function);
+              "                                                             \
+    number   : /-?[0-9]+/;                                                  \
+    symbol : '+' | '-' | '*' | '/' | '%' | '^';                             \
+    function : /[_a-zA-Z]+/;                                                \
+    sexpr    : '(' <expr>* ')';                                             \
+    expr     : <number> | <symbol> | <function> | <sexpr>;                  \
+    divlisp    : /^/ <expr>* /$/;                                           \
+    ",
+              Number, Symbol, Function, Sexpr, Expr, DivLisp);
 
     /*Print version and Exit Option*/
     puts("DivLisp version 0.1");

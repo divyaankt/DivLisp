@@ -170,7 +170,7 @@ lval *lval_read(mpc_ast_t *t)
         return lval_sym(t->contents);
     }
 
-    /*If root(>) or sexpr then create empty list*/
+    /*If root(>), sexpr or qexpr then create empty list*/
     lval *x = NULL;
     if (strcmp(t->tag, ">") == 0)
     {
@@ -179,6 +179,10 @@ lval *lval_read(mpc_ast_t *t)
     if (strstr(t->tag, "sexpr"))
     {
         x = lval_sexpr();
+    }
+    if (strstr(t->tag, "qexpr"))
+    {
+        x = lval_qexpr();
     }
 
     /* Fill this list with any valid expression contained within */
@@ -189,6 +193,14 @@ lval *lval_read(mpc_ast_t *t)
             continue;
         }
         if (strcmp(t->children[i]->contents, ")") == 0)
+        {
+            continue;
+        }
+        if (strcmp(t->children[i]->contents, "}") == 0)
+        {
+            continue;
+        }
+        if (strcmp(t->children[i]->contents, "{") == 0)
         {
             continue;
         }

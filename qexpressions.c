@@ -95,6 +95,16 @@ lval *lval_sexpr(void)
     return v;
 }
 
+/* A pointer to a new empty Qexpr lval */
+lval *lval_qexpr(void)
+{
+    lval *v = malloc(sizeof(lval));
+    v->type = LVAL_QEXPR;
+    v->count = 0;
+    v->cell = NULL;
+    return v;
+}
+
 /*Destructor for lval struct field*/
 void lval_del(lval *v)
 {

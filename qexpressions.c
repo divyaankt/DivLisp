@@ -123,7 +123,8 @@ void lval_del(lval *v)
         free(v->sym);
         break;
 
-    /*If Sexpr the delete all elements inside*/
+    /*If Sexpr or Qexpr, then delete all elements inside*/
+    case LVAL_QEXPR:
     case LVAL_SEXPR:
         for (int i = 0; i < v->count; i++)
         {

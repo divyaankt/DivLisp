@@ -157,6 +157,9 @@ void lval_del(lval *v)
             lval_del(v->cell[i]);
         }
 
+    case LVAL_FUN:
+        break;
+
         /*Also free the memory allocated to contain the pointers*/
         free(v->cell);
         break;

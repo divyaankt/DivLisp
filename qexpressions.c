@@ -438,6 +438,41 @@ lval *builtin_eval(lval *a)
     return lval_eval(x);
 }
 
+//Implementation of join function
+lval *builtin_join(lval *a)
+{
+
+    for (int i = 0; i < a->count; i++)
+    {
+        LASSERT(a, a->cell[i]->type == LVAL_QEXPR,
+                "Function 'join' passed incorrect type.");
+    }
+
+    lval *x = lval_pop(a, 0);
+
+    while (a->count)
+    {
+        x = lval_join(x, lval_pop(a, 0));
+    }
+
+    lval_del(a);
+    return x;
+}
+
+lval *lval_join(lval *x, lval *y)
+{
+
+    /* For each cell in 'y' add it to 'x' */
+    while (y->count)
+    {
+        x = lval_add(x, lval_pop(y, 0));
+    }
+
+    /* Delete the empty 'y' and return 'x' */
+    lval_del(y);
+    return x;
+}
+
 lval *lval_eval_sexpr(lval *v);
 /*Helper function to evaluate S-Expression*/
 lval *lval_eval(lval *v)

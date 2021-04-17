@@ -308,6 +308,74 @@ lval *lval_take(lval *v, int i)
     return x;
 }
 
+lval *lval_join(lval *x, lval *y)
+{
+
+    /* For each cell in 'y' add it to 'x' */
+    while (y->count)
+    {
+        x = lval_add(x, lval_pop(y, 0));
+    }
+
+    /* Delete the empty 'y' and return 'x' */
+    lval_del(y);
+    return x;
+}
+
+lval *lval_eval_sexpr(lval *v);
+/*Helper function to evaluate S-Expression*/
+lval *lval_eval(lval *v)
+{
+    /*Evaluate Sexpressions*/
+    if (v->type == LVAL_SEXPR)
+        return lval_eval_sexpr(v);
+
+    /*All other lval types remain the same*/
+    return v;
+}
+/*Main function for evaluating S-Expressions*/
+lval *lval_eval_sexpr(lval *v)
+{
+
+    /*Evaluate Children*/
+    for (int i = 0; i < v->count; i++)
+    {
+        v->cell[i] = lval_eval(v->cell[i]);
+    }
+
+    /*Error Checking*/
+    for (int i = 0; i < v->count; i++)
+    {
+        if (v->cell[i]->type == LVAL_ERR)
+            return lval_take(v, i);
+    }
+
+    /*Empty Expression*/
+    if (v->count == 0)
+        return v;
+
+    /*Single Expression*/
+    if (v->count == 1)
+        return lval_take(v, 0);
+
+    /*Ensure that first element is symbol*/
+    lval *f = lval_pop(v, 0);
+
+    if (f->type != LVAL_SYM)
+    {
+        lval_del(f);
+        lval_del(v);
+        return lval_err("S-Expression doesn't start with symbol!!");
+    }
+
+    /*Call builtin with operator*/
+    lval *result = builtin_op(v, f->sym);
+
+    lval_del(f);
+
+    return result;
+}
+
 /*Evaluation function which performs switch on operator passed*/
 lval *builtin_op(lval *a, char *op)
 {
@@ -457,74 +525,6 @@ lval *builtin_join(lval *a)
 
     lval_del(a);
     return x;
-}
-
-lval *lval_join(lval *x, lval *y)
-{
-
-    /* For each cell in 'y' add it to 'x' */
-    while (y->count)
-    {
-        x = lval_add(x, lval_pop(y, 0));
-    }
-
-    /* Delete the empty 'y' and return 'x' */
-    lval_del(y);
-    return x;
-}
-
-lval *lval_eval_sexpr(lval *v);
-/*Helper function to evaluate S-Expression*/
-lval *lval_eval(lval *v)
-{
-    /*Evaluate Sexpressions*/
-    if (v->type == LVAL_SEXPR)
-        return lval_eval_sexpr(v);
-
-    /*All other lval types remain the same*/
-    return v;
-}
-/*Main function for evaluating S-Expressions*/
-lval *lval_eval_sexpr(lval *v)
-{
-
-    /*Evaluate Children*/
-    for (int i = 0; i < v->count; i++)
-    {
-        v->cell[i] = lval_eval(v->cell[i]);
-    }
-
-    /*Error Checking*/
-    for (int i = 0; i < v->count; i++)
-    {
-        if (v->cell[i]->type == LVAL_ERR)
-            return lval_take(v, i);
-    }
-
-    /*Empty Expression*/
-    if (v->count == 0)
-        return v;
-
-    /*Single Expression*/
-    if (v->count == 1)
-        return lval_take(v, 0);
-
-    /*Ensure that first element is symbol*/
-    lval *f = lval_pop(v, 0);
-
-    if (f->type != LVAL_SYM)
-    {
-        lval_del(f);
-        lval_del(v);
-        return lval_err("S-Expression doesn't start with symbol!!");
-    }
-
-    /*Call builtin with operator*/
-    lval *result = builtin_op(v, f->sym);
-
-    lval_del(f);
-
-    return result;
 }
 
 int main(int argc, char **argv)

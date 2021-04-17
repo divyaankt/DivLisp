@@ -122,6 +122,15 @@ lval *lval_qexpr(void)
     return v;
 }
 
+/* A pointer to a new empty Fun lval */
+lval *lval_fun(lbuiltin func)
+{
+    lval *v = malloc(sizeof(lval));
+    v->type = LVAL_FUN;
+    v->fun = func;
+    return v;
+}
+
 /*Destructor for lval struct field*/
 void lval_del(lval *v)
 {

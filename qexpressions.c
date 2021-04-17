@@ -531,6 +531,7 @@ lval *builtin_join(lval *a)
     return x;
 }
 
+//Implemented the builtin function len
 lval *builtin_len(lval *a)
 {
     /* Check Error Conditions */
@@ -542,6 +543,23 @@ lval *builtin_len(lval *a)
     int listLen = a->cell[0]->count;
 
     return lval_num(listLen);
+}
+
+//Implemented the builtin function init
+//It returns all of a Q-Expression except the final element.
+lval *builtin_init(lval *a)
+{
+    /* Check Error Conditions */
+    LASSERT(a, a->count == 1,
+            "Function 'len' passed too many arguments, only 1 is required!");
+    LASSERT(a, a->cell[0]->type == LVAL_QEXPR,
+            "Function 'len' passed incorrect type!");
+
+    int lastItemIndex = a->cell[0]->count - 1;
+
+    lval *v = lval_take(a, 0);
+    lval_pop(v, lastItemIndex);
+    return v;
 }
 
 lval *builtin(lval *a, char *func)
@@ -570,6 +588,10 @@ lval *builtin(lval *a, char *func)
     {
         return builtin_len(a);
     }
+    if (strcmp("init", func) == 0)
+    {
+        return builtin_init(a);
+    }
     if (strstr("+-/*", func))
     {
         return builtin_op(a, func);
@@ -594,7 +616,7 @@ int main(int argc, char **argv)
               "                                                             \
     number   : /-?[0-9]+/ ;                                                  \
     symbol : \"list\" | \"head\" | \"tail\"                \
-           | \"join\" | \"eval\" | \"len\" | '+' | '-' | '*' | '/' | '%' | '^' ;                             \
+           | \"join\" | \"eval\" | \"len\" | \"init\" | '+' | '-' | '*' | '/' | '%' | '^' ;                             \
     sexpr    : '(' <expr>* ')' ;                                             \
     qexpr    : '{' <expr>* '}' ;                                             \
     expr     : <number> | <symbol> | <sexpr> | <qexpr> ;                    \

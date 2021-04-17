@@ -38,6 +38,12 @@ void add_history(char *unused) {}
 #include <editline/history.h>
 #endif
 
+/*Forward Declarations*/
+struct lval;
+struct lenv;
+typedef struct lval lval;
+typedef struct lenv lenv;
+
 /* Create Enumeration of Possible lval Types */
 enum
 {
@@ -45,11 +51,14 @@ enum
     LVAL_ERR,
     LVAL_SYM,   //Operator of S-Expression/Q-Expression
     LVAL_SEXPR, //Actual S-Expression
-    LVAL_QEXPR  //Actual Q-Expression
+    LVAL_QEXPR, //Actual Q-Expression
+    LVAL_FUN    //Function Type
 };
 
+typedef lval *(*lbuiltin)(lenv *, lval *);
+
 /* Declare New lval Struct */
-typedef struct lval
+struct lval
 {
     int type;
     double num;
@@ -57,11 +66,12 @@ typedef struct lval
     /*Error and Symbol types contain strings*/
     char *err;
     char *sym;
+    lbuiltin fun;
 
     /*Count and Pointer to a list of "lval*" */
     int count;
-    struct lval **cell;
-} lval;
+    lval **cell;
+};
 
 /* Construct a pointer to a new Number lval */
 lval *lval_num(double x)

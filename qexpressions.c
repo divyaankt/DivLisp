@@ -531,6 +531,19 @@ lval *builtin_join(lval *a)
     return x;
 }
 
+lval *builtin_len(lval *a)
+{
+    /* Check Error Conditions */
+    LASSERT(a, a->count == 1,
+            "Function 'len' passed too many arguments, only 1 is required!");
+    LASSERT(a, a->cell[0]->type == LVAL_QEXPR,
+            "Function 'len' passed incorrect type!");
+
+    int listLen = a->cell[0]->count;
+
+    return lval_num(listLen);
+}
+
 lval *builtin(lval *a, char *func)
 {
     if (strcmp("list", func) == 0)
@@ -552,6 +565,10 @@ lval *builtin(lval *a, char *func)
     if (strcmp("eval", func) == 0)
     {
         return builtin_eval(a);
+    }
+    if (strcmp("len", func) == 0)
+    {
+        return builtin_len(a);
     }
     if (strstr("+-/*", func))
     {
@@ -577,7 +594,7 @@ int main(int argc, char **argv)
               "                                                             \
     number   : /-?[0-9]+/ ;                                                  \
     symbol : \"list\" | \"head\" | \"tail\"                \
-           | \"join\" | \"eval\" | '+' | '-' | '*' | '/' | '%' | '^' ;                             \
+           | \"join\" | \"eval\" | \"len\" | '+' | '-' | '*' | '/' | '%' | '^' ;                             \
     sexpr    : '(' <expr>* ')' ;                                             \
     qexpr    : '{' <expr>* '}' ;                                             \
     expr     : <number> | <symbol> | <sexpr> | <qexpr> ;                    \

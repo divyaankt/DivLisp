@@ -416,6 +416,14 @@ lval *builtin_tail(lval *a)
     return v;
 }
 
+//Implementation of list function
+//It just converts the input S-Expression to a Q-Expression and returns it.
+lval *builtin_list(lval *a)
+{
+    a->type = LVAL_QEXPR;
+    return a;
+}
+
 lval *lval_eval_sexpr(lval *v);
 /*Helper function to evaluate S-Expression*/
 lval *lval_eval(lval *v)

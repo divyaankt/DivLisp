@@ -322,7 +322,10 @@ lval *lval_join(lval *x, lval *y)
     return x;
 }
 
+lval *builtin(lval *a, char *func);
+
 lval *lval_eval_sexpr(lval *v);
+
 /*Helper function to evaluate S-Expression*/
 lval *lval_eval(lval *v)
 {
@@ -333,6 +336,7 @@ lval *lval_eval(lval *v)
     /*All other lval types remain the same*/
     return v;
 }
+
 /*Main function for evaluating S-Expressions*/
 lval *lval_eval_sexpr(lval *v)
 {
@@ -369,7 +373,7 @@ lval *lval_eval_sexpr(lval *v)
     }
 
     /*Call builtin with operator*/
-    lval *result = builtin_op(v, f->sym);
+    lval *result = builtin(v, f->sym);
 
     lval_del(f);
 

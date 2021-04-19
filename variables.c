@@ -677,10 +677,8 @@ lval *builtin_join(lenv *e, lval *a)
 lval *builtin_len(lenv *e, lval *a)
 {
     /* Check Error Conditions */
-    LASSERT(a, a->count == 1,
-            "Function 'len' passed too many arguments, only 1 is required!");
-    LASSERT(a, a->cell[0]->type == LVAL_QEXPR,
-            "Function 'len' passed incorrect type!");
+    LASSERT_NUM("len", a, 1);
+    LASSERT_TYPE("len", a, 0, LVAL_QEXPR);
 
     int listLen = a->cell[0]->count;
 

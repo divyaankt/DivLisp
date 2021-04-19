@@ -645,10 +645,8 @@ lval *builtin_list(lenv *e, lval *a)
 //It takes as input some single Q-Expression, which it converts to an S-Expression, and evaluates using lval_eval.
 lval *builtin_eval(lenv *e, lval *a)
 {
-    LASSERT(a, a->count == 1,
-            "Function 'eval' passed too many arguments!");
-    LASSERT(a, a->cell[0]->type == LVAL_QEXPR,
-            "Function 'eval' passed incorrect type!");
+    LASSERT_NUM("eval", a, 1);
+    LASSERT_TYPE("eval", a, 0, LVAL_QEXPR);
 
     lval *x = lval_take(a, 0);
     x->type = LVAL_SEXPR;

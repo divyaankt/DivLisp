@@ -621,12 +621,9 @@ lval *builtin_head(lenv *e, lval *a)
 lval *builtin_tail(lenv *e, lval *a)
 {
     /* Check Error Conditions */
-    LASSERT(a, a->count == 1,
-            "Function 'tail' passed too many arguments!");
-    LASSERT(a, a->cell[0]->type == LVAL_QEXPR,
-            "Function 'tail' passed incorrect type!");
-    LASSERT(a, a->cell[0]->count != 0,
-            "Function 'tail' passed {}!");
+    LASSERT_NUM("tail", a, 1);
+    LASSERT_TYPE("tail", a, 0, LVAL_QEXPR);
+    LASSERT_NOT_EMPTY("tail", a, 0);
 
     /* Take first argument */
     lval *v = lval_take(a, 0);

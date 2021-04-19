@@ -690,12 +690,9 @@ lval *builtin_len(lenv *e, lval *a)
 lval *builtin_init(lenv *e, lval *a)
 {
     /* Check Error Conditions */
-    LASSERT(a, a->count == 1,
-            "Function 'init' passed too many arguments, only 1 is required!");
-    LASSERT(a, a->cell[0]->type == LVAL_QEXPR,
-            "Function 'init' passed incorrect type!");
-    LASSERT(a, a->cell[0]->count != 0,
-            "Function 'init' passed {}, operation undefined for passed argument!");
+    LASSERT_NUM("init", a, 1);
+    LASSERT_TYPE("init", a, 0, LVAL_QEXPR);
+    LASSERT_NOT_EMPTY("init", a, 0);
 
     int lastItemIndex = a->cell[0]->count - 1;
 

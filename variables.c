@@ -2,12 +2,27 @@
 #include <stdlib.h>
 #include "mpc.h"
 
-#define LASSERT(args, cond, err) \
-    if (!(cond))                 \
-    {                            \
-        lval_del(args);          \
-        return lval_err(err);    \
+#define LASSERT(args, cond, fmt, ...)             \
+    if (!(cond))                                  \
+    {                                             \
+        lval *err = lval_err(fmt, ##__VA_ARGS__); \
+        lval_del(args);                           \
+        return err;                               \
     }
+
+#define LASSERT_TYPE(func, args, index, expect)                                          \
+    LASSERT(args, args->cell[index]->type == expect,                                     \
+            "Function '%s' passed incorrect type for argument %i. Got %s, Expected %s.", \
+            func, index, ltype_name(args->cell[index]->type), ltype_name(expect))
+
+#define LASSERT_NUM(func, args, num)                                                    \
+    LASSERT(args, args->count == num,                                                   \
+            "Function '%s' passed incorrect number of arguments. Got %i, Expected %i.", \
+            func, args->count, num)
+
+#define LASSERT_NOT_EMPTY(func, args, index)     \
+    LASSERT(args, args->cell[index]->count != 0, \
+            "Function '%s' passed {} for argument %i.", func, index);
 
 //If we are compiling on a Windows, include these functions
 #ifdef _WIN32
@@ -785,6 +800,9 @@ int main(int argc, char **argv)
     puts("DivLisp version 0.1");
     puts("Press Ctrl+C to Exit\n");
 
+    lenv *e = lenv_new();
+    lenv_add_builtins(e);
+
     /*REPL Loop*/
     while (1)
     {
@@ -804,9 +822,11 @@ int main(int argc, char **argv)
             lval_println(result);
             //mpc_ast_print(r.output);
             mpc_ast_delete(r.output);*/
-            lval *x = lval_eval(lval_read(r.output));
+            lval *x = lval_eval(e, lval_read(r.output));
             lval_println(x);
             lval_del(x);
+
+            mpc_ast_delete(r.output);
         }
         else
         {

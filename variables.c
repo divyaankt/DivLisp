@@ -2,31 +2,11 @@
 #include <stdlib.h>
 #include "mpc.h"
 
-#define LASSERT(args, cond, fmt, ...)             \
-    if (!(cond))                                  \
-    {                                             \
-        lval *err = lval_err(fmt, ##__VA_ARGS__); \
-        lval_del(args);                           \
-        return err;                               \
-    }
-
-#define LASSERT_TYPE(func, args, index, expect)                                          \
-    LASSERT(args, args->cell[index]->type == expect,                                     \
-            "Function '%s' passed incorrect type for argument %i. Got %s, Expected %s.", \
-            func, index, ltype_name(args->cell[index]->type), ltype_name(expect))
-
-#define LASSERT_NUM(func, args, num)                                                    \
-    LASSERT(args, args->count == num,                                                   \
-            "Function '%s' passed incorrect number of arguments. Got %i, Expected %i.", \
-            func, args->count, num)
-
-#define LASSERT_NOT_EMPTY(func, args, index)     \
-    LASSERT(args, args->cell[index]->count != 0, \
-            "Function '%s' passed {} for argument %i.", func, index);
-
 //If we are compiling on a Windows, include these functions
 #ifdef _WIN32
 #include <string.h>
+
+static char buffer[2048];
 
 //Custom implementation of readline()
 char *readline(char *prompt)
@@ -106,12 +86,27 @@ lval *lval_num(double x)
 }
 
 /* Construct a pointer to a new Error lval */
-lval *lval_err(char *m)
+lval *lval_err(char *fmt, ...)
 {
     lval *v = malloc(sizeof(lval));
     v->type = LVAL_ERR;
-    v->err = malloc(strlen(m) + 1);
-    strcpy(v->err, m);
+
+    /* Create a va list and initialize it */
+    va_list va;
+    va_start(va, fmt);
+
+    /* Allocate 512 bytes of space */
+    v->err = malloc(512);
+
+    /* printf the error string with a maximum of 511 characters */
+    vsnprintf(v->err, 511, fmt, va);
+
+    /* Reallocate to number of bytes actually used */
+    v->err = realloc(v->err, strlen(v->err) + 1);
+
+    /* Cleanup our va list */
+    va_end(va);
+
     return v;
 }
 
@@ -361,6 +356,27 @@ void lval_println(lval *v)
     putchar('\n');
 }
 
+char *ltype_name(int t)
+{
+    switch (t)
+    {
+    case LVAL_FUN:
+        return "Function";
+    case LVAL_NUM:
+        return "Number";
+    case LVAL_ERR:
+        return "Error";
+    case LVAL_SYM:
+        return "Symbol";
+    case LVAL_SEXPR:
+        return "S-Expression";
+    case LVAL_QEXPR:
+        return "Q-Expression";
+    default:
+        return "Unknown";
+    }
+}
+
 /*
 The lval_pop function extracts a single element from an S-Expression at index i 
 and shifts the rest of the list backward so that it no longer contains that lval*. 
@@ -413,10 +429,9 @@ lval *lval_join(lval *x, lval *y)
     return x;
 }
 
-lval *builtin(lval *a, char *func);
-
 lval *lval_eval_sexpr(lenv *e, lval *v);
 
+lval *lenv_get(lenv *e, lval *k);
 /*Helper function to evaluate S-Expression*/
 lval *lval_eval(lenv *e, lval *v)
 {
@@ -477,6 +492,28 @@ lval *lval_eval_sexpr(lenv *e, lval *v)
 
     return result;
 }
+
+#define LASSERT(args, cond, fmt, ...)             \
+    if (!(cond))                                  \
+    {                                             \
+        lval *err = lval_err(fmt, ##__VA_ARGS__); \
+        lval_del(args);                           \
+        return err;                               \
+    }
+
+#define LASSERT_TYPE(func, args, index, expect)                                          \
+    LASSERT(args, args->cell[index]->type == expect,                                     \
+            "Function '%s' passed incorrect type for argument %i. Got %s, Expected %s.", \
+            func, index, ltype_name(args->cell[index]->type), ltype_name(expect))
+
+#define LASSERT_NUM(func, args, num)                                                    \
+    LASSERT(args, args->count == num,                                                   \
+            "Function '%s' passed incorrect number of arguments. Got %i, Expected %i.", \
+            func, args->count, num)
+
+#define LASSERT_NOT_EMPTY(func, args, index)     \
+    LASSERT(args, args->cell[index]->count != 0, \
+            "Function '%s' passed {} for argument %i.", func, index);
 
 /*Evaluation function which performs switch on operator passed*/
 lval *builtin_op(lenv *e, lval *a, char *op)
@@ -677,6 +714,8 @@ lval *builtin_init(lenv *e, lval *a)
     lval_pop(v, lastItemIndex);
     return v;
 }
+
+void lenv_put(lenv *e, lval *k, lval *v);
 
 void lenv_add_builtin(lenv *e, char *name, lbuiltin func)
 {

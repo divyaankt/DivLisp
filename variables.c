@@ -602,12 +602,9 @@ lval *builtin_div(lenv *e, lval *a)
 lval *builtin_head(lenv *e, lval *a)
 {
     /*Check Error Conditions*/
-    LASSERT(a, a->count == 1,
-            "Function 'head' passed too many arguments!");
-    LASSERT(a, a->cell[0]->type == LVAL_QEXPR,
-            "Function 'head' passed incorrect type!");
-    LASSERT(a, a->cell[0]->count != 0,
-            "Function 'head' passed {}!");
+    LASSERT_NUM("head", a, 1);
+    LASSERT_TYPE("head", a, 0, LVAL_QEXPR);
+    LASSERT_NOT_EMPTY("head", a, 0);
 
     /*Otherwise take first argument*/
     lval *v = lval_take(a, 0);

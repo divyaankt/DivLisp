@@ -715,6 +715,8 @@ lval *builtin_init(lenv *e, lval *a)
     return v;
 }
 
+void lenv_put(lenv *e, lval *k, lval *v);
+
 lval *builtin_def(lenv *e, lval *a)
 {
     LASSERT(a, a->cell[0]->type == LVAL_QEXPR, "Function 'def' passed incorrect type!");
@@ -743,8 +745,6 @@ lval *builtin_def(lenv *e, lval *a)
     lval_del(a);
     return lval_sexpr();
 }
-
-void lenv_put(lenv *e, lval *k, lval *v);
 
 void lenv_add_builtin(lenv *e, char *name, lbuiltin func)
 {

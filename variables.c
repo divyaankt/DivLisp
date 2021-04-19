@@ -659,8 +659,7 @@ lval *builtin_join(lenv *e, lval *a)
 
     for (int i = 0; i < a->count; i++)
     {
-        LASSERT(a, a->cell[i]->type == LVAL_QEXPR,
-                "Function 'join' passed incorrect type.");
+        LASSERT_TYPE("join", a, i, LVAL_QEXPR);
     }
 
     lval *x = lval_pop(a, 0);
